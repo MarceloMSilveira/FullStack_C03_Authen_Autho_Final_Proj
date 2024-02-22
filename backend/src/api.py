@@ -1,14 +1,12 @@
-import os
 from flask import Flask, request, jsonify, abort
-from sqlalchemy import exc
-import json
+from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-
 from .database.models import db_drop_and_create_all, setup_db, Drink
-from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
-setup_db(app)
+with app.app_context():
+    setup_db(app)
+    db_drop_and_create_all()
 CORS(app)
 
 '''
@@ -17,7 +15,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-db_drop_and_create_all()
+
 
 # ROUTES
 '''
