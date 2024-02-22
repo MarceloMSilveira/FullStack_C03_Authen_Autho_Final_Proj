@@ -91,8 +91,11 @@ def check_permissions(permission, payload):
 '''
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    #print(jsonurl)
     jwks = json.loads(jsonurl.read())
+    #print(jwks)
     unverified_header = jwt.get_unverified_header(token)
+    #print(unverified_header)
     rsa_key = {}
     if 'kid' not in unverified_header:
         raise AuthError({
@@ -111,6 +114,7 @@ def verify_decode_jwt(token):
             }
     if rsa_key:
         try:
+            #print(token)
             payload = jwt.decode(
                 token,
                 rsa_key,
@@ -157,10 +161,11 @@ def requires_auth(permission=''):
         @wraps(f)
         def wrapper(*args, **kwargs):
             token = get_token_auth_header()
+            #print(token)
             try:
                 payload = verify_decode_jwt(token)
             except:
-                abort(401)
+                abort(401, "denied!")
 
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
