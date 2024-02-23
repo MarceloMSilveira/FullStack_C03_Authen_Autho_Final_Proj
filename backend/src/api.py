@@ -61,6 +61,7 @@ def drinks_post(param):
     data = request.get_json()
     title = data.get('title')
     recipe = data.get('recipe')
+    print(recipe)
     if not title or not recipe:
         abort(400, 'Both title and recipe are required.')
     drink = Drink(title=title,recipe=json.dumps(recipe))
@@ -111,7 +112,19 @@ def drinks_patch(param,drink_id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def drinks_delete(param,drink_id):
+    drink = Drink.query.filter(Drink.id==drink_id).first()
+    if not drink:
+        abort(404, "drink id not found")
+    
+    drink.delete()
+         
+    return jsonify({
+        "sucess":"True",
+        "created":"The drink has been deleted!"
+    })
 
 # Error Handling
 '''
