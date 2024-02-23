@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import requires_auth
+import json
 
 app = Flask(__name__)
 with app.app_context():
@@ -60,11 +61,13 @@ def drinks_post(param):
     data = request.get_json()
     title = data.get('title')
     recipe = data.get('recipe')
-    drink = Drink(title=title,recipe=recipe)
+    if not title or not recipe:
+        abort(400, 'Both title and recipe are required.')
+    drink = Drink(title=title,recipe=json.dumps(recipe))
     drink.insert()
     return jsonify({
         "sucess":"True",
-        "created":"A new drink was created with id = {}".format(drink.id)
+        "created":"A new drink was created : {}".format(drink.long())
     })
 
 '''
@@ -78,7 +81,25 @@ def drinks_post(param):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def drinks_patch(param,drink_id):
+    drink = Drink.query.get(drink_id)
+    if not drink:
+        abort(404, "drink id not found")
+    
+    data = request.get_json()
+    title = data.get('title')
+    recipe = data.get('recipe')
+    if title:    
+        drink.title = title
+    if recipe:
+        drink.recipe = json.dumps(recipe)
+        
+    return jsonify({
+        "sucess":"True",
+        "created":"The drink has been modernized : {}".format(drink.long())
+    })
 
 '''
 @TODO implement endpoint
@@ -116,7 +137,13 @@ def unprocessable(error):
                     }), 404
 
 '''
-
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "sucess": False,
+        "error": 404,
+        "message":"resource not found"
+    }), 404
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above
