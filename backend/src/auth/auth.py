@@ -115,6 +115,7 @@ def verify_decode_jwt(token):
     if rsa_key:
         try:
             #print(token)
+            #print(rsa_key)
             payload = jwt.decode(
                 token,
                 rsa_key,
@@ -122,7 +123,7 @@ def verify_decode_jwt(token):
                 audience=API_AUDIENCE,
                 issuer='https://' + AUTH0_DOMAIN + '/'
             )
-
+            print(payload)
             return payload
 
         except jwt.ExpiredSignatureError:

@@ -37,7 +37,7 @@ def drinks():
 '''
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
-def drinks_detail():
+def drinks_detail(param):
     drinks = Drink.query.all()
     return jsonify({
         'success': True,
@@ -85,7 +85,6 @@ def drinks_detail():
 '''
 Example error handling for unprocessable entity
 '''
-
 
 @app.errorhandler(422)
 def unprocessable(error):
