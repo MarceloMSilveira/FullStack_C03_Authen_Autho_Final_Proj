@@ -62,6 +62,7 @@ def drinks_post(param):
     title = data.get('title')
     recipe = data.get('recipe')
     print(recipe)
+    recipe = [recipe]
     if not title or not recipe:
         abort(400, 'Both title and recipe are required.')
     drink = Drink(title=title,recipe=json.dumps(recipe))
