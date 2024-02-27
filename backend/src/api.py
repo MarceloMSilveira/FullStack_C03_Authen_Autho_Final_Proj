@@ -92,15 +92,16 @@ def drinks_patch(param,drink_id):
     
     data = request.get_json()
     title = data.get('title')
-    recipe = data.get('recipe')
-    if title:    
-        drink.title = title
-    if recipe:
-        drink.recipe = json.dumps(recipe)
-        
+    #recipe = [data.get('recipe')]
+    if (not title) :
+        abort(404, "No changes to do.")
+    
+    drink.title = title
+    drink.update()
+
     return jsonify({
         "sucess":"True",
-        "created":"The drink has been modernized : {}".format(drink.long())
+        'drinks': [drink.long()]
     })
 
 '''
@@ -124,7 +125,7 @@ def drinks_delete(param,drink_id):
          
     return jsonify({
         "sucess":"True",
-        "created":"The drink has been deleted!"
+        "created":f"The drink {drink_id} has been deleted!"
     })
 
 # Error Handling
