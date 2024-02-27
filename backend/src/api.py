@@ -92,40 +92,17 @@ def drinks_patch(param,drink_id):
     
     data = request.get_json()
     title = data.get('title')
-    recipe = data.get('recipe')
-    if title:    
-        drink.title = title
-    if recipe:
-        drink.recipe = json.dumps(recipe)
-        
-    return jsonify({
-        "sucess":"True",
-        "created":"The drink has been modernized : {}".format(drink.long())
-    })
-
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
-'''
-@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-@requires_auth('delete:drinks')
-def drinks_delete(param,drink_id):
-    drink = Drink.query.filter(Drink.id==drink_id).first()
-    if not drink:
-        abort(404, "drink id not found")
+    #recipe = [data.get('recipe')]
+    if (not title) :
+        abort(404, "No changes to do.")
     
-    drink.delete()
-         
+    drink.title = title
+    drink.update()
+
     return jsonify({
         "sucess":"True",
-        "created":"The drink has been deleted!"
-    })
+        'drinks': [drink.long()]
+    })   
 
 # Error Handling
 '''
@@ -168,3 +145,7 @@ def not_found(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above
 '''
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
