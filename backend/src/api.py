@@ -61,10 +61,10 @@ def drinks_post(param):
     data = request.get_json()
     title = data.get('title')
     recipe = [data.get('recipe')]
-    print('recipe: '+str(recipe))
+    #print('recipe: '+str(recipe))
     if not title or not recipe:
         abort(400, 'Both title and recipe are required.')
-    drink = Drink(title=title,recipe=str(recipe))
+    drink = Drink(title=title,recipe=json.dumps(recipe))
     drink.insert()
     return jsonify({
         "sucess":"True",
